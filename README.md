@@ -7,7 +7,8 @@ functions.
 Features:
   - FFT convolutions with x interpolant and Fourier wrapping.
 
-**Contributions and Feature Requests Welcome !!!**
+**Contributions and Feature Requests Welcome !!!** Don't hesitate to open an
+issue.
 
 ## Setup
 
