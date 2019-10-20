@@ -1,5 +1,5 @@
 # GalFlow
-A TensorFlow reimplementation of GalSim (yes, not ambitious at all ^^'')
+A TensorFlow reimplementation of GalSim (no, not ambitious at all ^^')
 
 This repository is meant to host TensorFlow implementations of useful GalSim
 functions.
@@ -16,4 +16,4 @@ issue.
 $ pip install --user galflow
 ```
 
-For usage example, see [this notebook](notebooks/GalFlow_demo)
+For usage example, see [this notebook](notebooks/GalFlow_demo.ipynb)
