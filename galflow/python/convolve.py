@@ -44,7 +44,7 @@ def kconvolve(kimages, kpsf,
   Careful! This function doesn't remove zero padding.
   Careful! When using a kimage and kpsf from GalSim,
            one needs to apply an fftshift at the output.
-           
+
   This function assumes that the k-space tensors are already prodided with the
   stepk and maxk corresponding to the specified interpolation and zero padding
   factors.
@@ -96,6 +96,9 @@ def convolve(images, kpsf,
                         Ny*interp_factor*zero_padding_factor],
                         method=x_interpolant,
                         align_corners=False)
+    # Since we lower the resolution of the image, we also scale the flux
+    # accordingly
+    im = im / interp_factor**2
 
   # Compute DFT
   imk = tf.signal.rfft2d(im[...,0])
@@ -104,5 +107,6 @@ def convolve(images, kpsf,
   imconv = kconvolve(imk, kpsf,
                    zero_padding_factor=zero_padding_factor,
                    interp_factor=interp_factor)
+
   # Removing zero padding
   return tfimage.resize_image_with_crop_or_pad(imconv, Nx, Nx)
