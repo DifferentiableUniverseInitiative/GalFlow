@@ -1,5 +1,5 @@
 # GalFlow
-A TensorFlow reimplementation of GalSim
+A TensorFlow reimplementation of GalSim (yes, not ambitious at all ^^'')
 
 This repository is meant to host TensorFlow implementations of useful GalSim
 functions.
@@ -12,7 +12,7 @@ issue.
 
 ## Setup
 
-```python
+```bash
 $ pip install --user galflow
 ```
 
