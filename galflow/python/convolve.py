@@ -4,7 +4,6 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
-import tensorflow.image as tfimage
 
 __all__ = ["convolve", "kconvolve"]
 
@@ -68,7 +67,7 @@ def kconvolve(kimages, kpsf,
   return conv_images
 
 def convolve(images, kpsf,
-             x_interpolant=tfimage.ResizeMethod.BICUBIC,
+             x_interpolant=tf.image.ResizeMethod.BICUBIC,
              zero_padding_factor=2,
              interp_factor=2):
   """
@@ -84,21 +83,21 @@ def convolve(images, kpsf,
   assert Nx % 2 == 0
   assert Nc == 1
 
-  # First we zero pad the image
-  im = tfimage.resize_image_with_crop_or_pad(images,
-                                             zero_padding_factor*Nx,
-                                             zero_padding_factor*Ny)
-
-  # Now we interpolate the image on a finer grid
+  # First, we interpolate the image on a finer grid
   if interp_factor > 1:
-    im = tfimage.resize(im,
-                        [Nx*interp_factor*zero_padding_factor,
-                        Ny*interp_factor*zero_padding_factor],
-                        method=x_interpolant,
-                        align_corners=False)
+    im = tf.image.resize(images,
+                        [Nx*interp_factor,
+                        Ny*interp_factor],
+                        method=x_interpolant)
     # Since we lower the resolution of the image, we also scale the flux
     # accordingly
-    im = im / interp_factor**2
+    images = im / interp_factor**2
+
+  # Second, we pad as necessary
+  im = tf.image.resize_with_crop_or_pad(images,
+                                       zero_padding_factor*Nx*interp_factor,
+                                       zero_padding_factor*Ny*interp_factor)
+
 
   # Compute DFT
   imk = tf.signal.rfft2d(im[...,0])
@@ -109,4 +108,4 @@ def convolve(images, kpsf,
                    interp_factor=interp_factor)
 
   # Removing zero padding
-  return tfimage.resize_image_with_crop_or_pad(imconv, Nx, Nx)
+  return tf.image.resize_with_crop_or_pad(imconv, Nx, Nx)

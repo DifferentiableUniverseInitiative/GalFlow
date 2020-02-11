@@ -20,7 +20,6 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=[
-        'tensorflow<2.0.0',
         'galsim'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
