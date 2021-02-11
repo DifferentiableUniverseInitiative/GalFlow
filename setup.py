@@ -15,12 +15,11 @@ setup(
     description='GalSim reimplementation in TensorFlow',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    author='ML4Astro Contributors',
-    url='http://github.com/ml4astro/GalFlow',
+    author='DUI Contributors',
+    url='http://github.com/DiffentiableUniverseInitiative/GalFlow',
     license='MIT',
     packages=find_packages(),
-    install_requires=[
-        'galsim'],
+    install_requires=['galsim', 'tfa-nightly', 'tfg-nightly'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

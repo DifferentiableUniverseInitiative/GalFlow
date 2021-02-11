@@ -5,3 +5,5 @@ from __future__ import division
 from __future__ import print_function
 
 from galflow.python.convolve import *
+from galflow.python.shear import *
+from galflow.python.transform import *
