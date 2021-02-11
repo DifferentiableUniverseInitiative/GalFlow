@@ -55,7 +55,7 @@ def shear_transformation(g1, g2):
   # Inverting these jacobians to follow the TF definition
   jac = tf.linalg.inv(jac)
   jac = tf.pad(jac, tf.constant([[0, 0], [0, 1],[0,1]]) )
-  jac = jac + tf.pad(tf.ones([16,1,1]), tf.constant([[0,0],[2,0],[2,0]]))
+  jac = jac + tf.pad(tf.reshape(tf.ones_like(g1), [-1,1,1]), tf.constant([[0,0],[2,0],[2,0]]))
   return jac
 
 def shear(img, g1, g2):
