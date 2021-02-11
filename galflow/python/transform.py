@@ -64,7 +64,6 @@ def transform(img, transform_matrix, keep_center=True):
     Transformed image, tensor of shape [batch_size, nx, ny, nchannels]
   """
   img = tf.convert_to_tensor(img, dtype=tf.float32)
-  flux_ratio = tf.convert_to_tensor(flux_ratio, dtype=tf.float32)
   # Extract shape of image
   nb, nx, ny, nc = tf.shape(img)
 
