@@ -71,7 +71,7 @@ def transform(img, transform_matrix, keep_center=True):
                                                                 shift[:,1]),
                                            transform_matrix])
 
-  if img.dtype == tf.copmplex64:
+  if img.dtype == tf.complex64:
     a = perspective_transform(tf.math.real(img),
                               transform_matrix=transform_matrix,
                               pixel_type=PixelType.INTEGER)
