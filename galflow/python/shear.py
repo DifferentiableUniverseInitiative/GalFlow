@@ -12,7 +12,7 @@ from galflow.python.transform import transform
 
 __all__ = ["shear", "shear_transformation"]
 
-def shear_transformation(g1, g2):
+def shear_transformation(g1, g2, Fourier=False):
   """
   Function to compute the affine transformation corresponding to a given shear.
   This function uses the reduced shear definition:
@@ -53,13 +53,17 @@ def shear_transformation(g1, g2):
   jac = tf.reshape(jac, [-1,2,2])
 
   # Inverting these jacobians to follow the TF definition
-  jac = tf.linalg.inv(jac)
+  if Fourier:
+    jac = tf.transpose(jac)
+  else:
+    jac = tf.linalg.inv(jac)
   jac = tf.pad(jac, tf.constant([[0, 0], [0, 1],[0,1]]) )
   jac = jac + tf.pad(tf.reshape(tf.ones_like(g1), [-1,1,1]), tf.constant([[0,0],[2,0],[2,0]]))
   return jac
 
 def shear(img, g1, g2):
-  """ Convenience function to apply a shear to an input image
+  """ Convenience function to apply a shear to an input image or kimage
   """
-  transform_matrix = shear_transformation(g1, g2)
+  transform_matrix = shear_transformation(g1, g2,
+                                          Fourier=img.dtype == tf.complex64)
   return transform(img, transform_matrix)

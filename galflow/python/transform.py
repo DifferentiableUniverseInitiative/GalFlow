@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
-from tensorflow_graphics.image.transformer import perspective_transform
+from tensorflow_graphics.image.transformer import perspective_transform, PixelType
 
 __all__ = ["transform", "compose_transforms", "shift_transformation"]
 
@@ -41,7 +41,7 @@ def shift_transformation(nx, ny):
 
 def transform(img, transform_matrix, keep_center=True):
   """
-  Function for transforming an image.
+  Function for transforming an image or kimage.
 
   TODO: improve documentation, doesnt handle chromaticity yet
 
@@ -50,20 +50,15 @@ def transform(img, transform_matrix, keep_center=True):
   img: image tensor [bacth_size, nx, ny, nchannels]
     Input image to transform
 
-  jac: tensor of shape [4]
-    Jacobian of the transformation ( dudx, dudy, dvdx, dvdy )[default: (1,0,0,1)]
-
-  offset: tensor of shape [batch_size, 2]
-    Offset to apply to each image
-
-  flux_ratio:
-    A factor by which to multiply the surface brightness profile.
+  Fourier: bool
+    When doing an interpolation in Fourier space, the center of pixels is on
+    integer values, so set to true if transforming in Fourier space.
 
   Returns:
   -------
     Transformed image, tensor of shape [batch_size, nx, ny, nchannels]
   """
-  img = tf.convert_to_tensor(img, dtype=tf.float32)
+  img = tf.convert_to_tensor(img)
   # Extract shape of image
   nb, nx, ny, nc = tf.shape(img)
 
@@ -75,4 +70,14 @@ def transform(img, transform_matrix, keep_center=True):
     transform_matrix = compose_transforms([shift_transformation(shift[:,0],
                                                                 shift[:,1]),
                                            transform_matrix])
-  return perspective_transform(img, transform_matrix=transform_matrix)
+
+  if img.dtype == tf.copmplex64:
+    a = perspective_transform(tf.math.real(img),
+                              transform_matrix=transform_matrix,
+                              pixel_type=PixelType.INTEGER)
+    b = perspective_transform(tf.math.imag(img),
+                              transform_matrix=transform_matrix,
+                              pixel_type=PixelType.INTEGER)
+    return tf.complex(a,b)
+  else:
+    return perspective_transform(img, transform_matrix=transform_matrix)
