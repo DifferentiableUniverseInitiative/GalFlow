@@ -54,7 +54,7 @@ def shear_transformation(g1, g2, Fourier=False):
 
   # Inverting these jacobians to follow the TF definition
   if Fourier:
-    jac = tf.transpose(jac)
+    jac = tf.transpose(jac, [0,2,1])
   else:
     jac = tf.linalg.inv(jac)
   jac = tf.pad(jac, tf.constant([[0, 0], [0, 1],[0,1]]) )
