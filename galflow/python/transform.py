@@ -60,7 +60,7 @@ def transform(img, transform_matrix, keep_center=True):
   """
   img = tf.convert_to_tensor(img)
   # Extract shape of image
-  nb, nx, ny, nc = tf.shape(img).as_list()
+  nb, nx, ny, nc = img.get_shape().as_list()
 
   if keep_center:
     center = tf.convert_to_tensor([nx/2, ny/2, 1.], dtype=tf.float32)
