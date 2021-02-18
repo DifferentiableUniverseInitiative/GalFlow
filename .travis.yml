@@ -1,7 +1,7 @@
 language: python
 
 python:
-- '3.7'
+- '3.8'
 cache:
   directories:
   - "$HOME/.cache/pip"
@@ -15,7 +15,7 @@ before_install:
 - "./miniconda.sh -b -p $HOME/miniconda"
 - export PATH=$HOME/miniconda/bin:$PATH
 - conda update --yes conda
-- conda create --yes -n test python=$PYTHON_VERSION
+- conda create --yes -n test python=3.8
 - source activate test
 - conda install --yes numpy=$NUMPY_VERSION
 - conda install --yes -c conda-forge galsim
