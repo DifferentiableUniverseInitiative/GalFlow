@@ -17,7 +17,7 @@ before_install:
 - conda update --yes conda
 - conda create --yes -n test python=3.8
 - source activate test
-- conda install --yes pip
+- conda install --yes pip pytest
 - conda install --yes -c conda-forge galsim
 - conda list
 install:
