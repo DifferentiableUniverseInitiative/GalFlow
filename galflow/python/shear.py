@@ -19,8 +19,6 @@ def shear_transformation(g1, g2, Fourier=False):
 
     :math:`|g| = \frac{a - b}{a + b}`
 
-  TODO: better documentation (the following is stolen from galsim)
-
   If a field is sheared by some shear, s, then the position (x,y) -> (x',y')
   according to:
   .. math::
@@ -62,7 +60,7 @@ def shear_transformation(g1, g2, Fourier=False):
   return jac
 
 def shear(img, g1, g2):
-  """ Convenience function to apply a shear to an input image or kimage
+  """ Convenience function to apply a shear to an input image or kimage.
   """
   transform_matrix = shear_transformation(g1, g2,
                                           Fourier=img.dtype == tf.complex64)

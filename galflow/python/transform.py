@@ -43,8 +43,6 @@ def transform(img, transform_matrix, keep_center=True):
   """
   Function for transforming an image or kimage.
 
-  TODO: improve documentation, doesnt handle chromaticity yet
-
   Parameters:
   -----------
   img: image tensor [bacth_size, nx, ny, nchannels]
