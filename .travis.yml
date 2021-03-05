@@ -21,7 +21,7 @@ before_install:
 - conda install --yes -c conda-forge galsim
 - conda list
 install:
-- pip install --uprade pyerfa
+- pip install --upgrade pyerfa
 - pip install gast==0.2.2
 - pip install tensorflow==2.4.1
 - pip install .
