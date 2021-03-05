@@ -23,6 +23,7 @@ before_install:
 install:
 - pip install gast==0.2.2
 - pip install tensorflow==2.4.1
+- pip install erfa
 - pip install .
 script:
 - pytest
