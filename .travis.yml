@@ -18,10 +18,9 @@ before_install:
 - conda create --yes -n test python=3.8
 - source activate test
 - conda install --yes pip pytest
-- conda install --yes -c conda-forge galsim
+- conda install --yes -c conda-forge galsim pyerfa astropy
 - conda list
 install:
-- pip install --upgrade pyerfa astropy
 - pip install gast==0.2.2
 - pip install tensorflow==2.4.1
 - pip install .
