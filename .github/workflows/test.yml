@@ -20,7 +20,7 @@ jobs:
     name: tests
     strategy:
       matrix:
-        pyver: [3.6, 3.7, 3.8]
+        pyver: [3.6, 3.7]
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
