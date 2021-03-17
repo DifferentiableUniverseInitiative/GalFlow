@@ -48,8 +48,7 @@ jobs:
             flake8 \
             scipy \
             pytest \
-            galsim \
-            tensorflow
+            galsim 
 
           python -m pip install -e .
 
