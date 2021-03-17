@@ -59,6 +59,3 @@ jobs:
         shell: bash -l {0}
         run: |
           pytest 
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
