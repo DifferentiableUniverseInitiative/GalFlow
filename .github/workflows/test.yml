@@ -48,7 +48,7 @@ jobs:
             flake8 \
             scipy \
             pytest \
-            galsim 
+            galsim
 
           python -m pip install -e .
 
