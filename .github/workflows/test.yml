@@ -2,7 +2,7 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
@@ -28,14 +28,14 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ matrix.pyver }}
           channels: conda-forge,defaults
           channel-priority: strict
           show-channel-urls: true
-          
+
       # Runs a set of commands using the runners shell
       - name: configure conda and install code
         shell: bash -l {0}
@@ -45,17 +45,15 @@ jobs:
             pip \
             setuptools \
             numpy \
-            numba \
             flake8 \
-            pyyaml \
             scipy \
             pytest \
             galsim \
             tensorflow
-            
+
           python -m pip install -e .
-          
+
       - name: test
         shell: bash -l {0}
         run: |
-          pytest 
+          pytest

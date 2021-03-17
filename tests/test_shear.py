@@ -47,4 +47,4 @@ def test_shear_linear_interpolant():
   # Apply shear
   image_galflow = gf.shear(img, tfg1, tfg2)
 
-  assert_allclose(image_galsim, image_galflow, rtol=1e-06)
+  assert_allclose(image_galsim, image_galflow[0,:,:,0], rtol=1e-06)
