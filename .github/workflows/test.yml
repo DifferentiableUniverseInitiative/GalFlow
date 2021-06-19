@@ -49,7 +49,8 @@ jobs:
             scipy \
             pytest \
             galsim
-
+          
+          python -m pip install tensorflow==2.5.0 tensorflow_addons==0.13.0
           python -m pip install -e .
 
       - name: test
