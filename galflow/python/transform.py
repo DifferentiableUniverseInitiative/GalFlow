@@ -5,7 +5,7 @@ from __future__ import print_function
 
 import numpy as np
 import tensorflow as tf
-from tensorflow_graphics.image.transformer import perspective_transform, PixelType
+from galflow.python.tfutils import perspective_transform, PixelType
 
 __all__ = ["transform", "compose_transforms", "shift_transformation"]
 

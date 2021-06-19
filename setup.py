@@ -19,7 +19,7 @@ setup(
     url='http://github.com/DiffentiableUniverseInitiative/GalFlow',
     license='MIT',
     packages=find_packages(),
-    install_requires=['tfa-nightly', 'tfg-nightly'],
+    install_requires=['tfa-nightly'],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
