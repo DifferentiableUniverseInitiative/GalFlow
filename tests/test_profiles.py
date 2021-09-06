@@ -84,5 +84,6 @@ def test_sersic_profile():
   image_galflow_trunct = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size, ny=stamp_size+1, trunc=trunc, flux_untruncated=True)
 
   assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-4)
+  assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-4)
   assert_allclose(image_galsim_truncf, image_galflow_truncf, rtol=1e-4)
   assert_allclose(image_galsim_trunct, image_galflow_trunct, rtol=1e-4)
