@@ -17,8 +17,23 @@ fwhm_factor = 2*math.sqrt(2*math.log(2))
 hlr_factor = math.sqrt(2*math.log(2))
 
 def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., nx=None, ny=None):
-  """
-  I(r) = exp(-r^2 /2/sigma^2)
+  """Function for generating a Gaussian profile:
+
+    :math:`I(r) = \exp\left(-\frac{r^2}{2\sigma^2}\right) / (2 \pi \sigma^2)`
+
+  Args:
+    sigma: `float`, sigma of the profile. Typically given in arcsec.
+    fwhm: `float`, full-width-half-max of the profile.  Typically given in arcsec.
+    half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
+    flux: `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
+    nx: `int`, width of the stamp
+    ny: `int`, height of the stamp
+
+  Returns:
+    `Tensor` of shape [nx, ny] of the centered profile
+
+  Example:
+    >>> gaussian(sigma=3., nx=55)
   """
   if nx is None:
     if ny is None:
@@ -52,8 +67,27 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., nx=None, ny
   return gaussian
 
 def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux_untruncated=False, nx=None, ny=None):
-  """
-  I also want specific parameters, see https://galsim-developers.github.io/GalSim/_build/html/sb.html
+  """Function for generating a Sersic profile:
+
+    :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
+    where
+    :math:`I0 = \pi r_0^2 (2n)!`
+
+  Args:
+    n: `int`, Sersic index.
+    half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
+    scale_radius: `float`, scale radius of the profile.  Typically given in arcsec.
+    flux: `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
+    nx: `int`, width of the stamp
+    ny: `int`, height of the stamp
+    trunc: `float`, an optional truncation radius at which the profile is made to drop to zero, in the same units as the size parameter.
+    flux_untruncated: `boolean`, specifies whether the ``flux`` and ``half_light_radius`` specifications correspond to the untruncated profile (``True``) or to the truncated profile (``False``, default)
+
+  Returns:
+    `Tensor` of shape [nx, ny] of the centered profile
+
+  Example:
+    >>> sersic(n=2, scale_radius=5., flux=40., nx=55)
   """
   if nx is None:
     if ny is None:
@@ -66,13 +100,14 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
 
   if trunc < 0.:
     raise ValueError("Sersic trunc must be > 0.")
-    
+
   if half_light_radius is not None:
     if scale_radius is not None:
       raise ValueError("Only one of scale_radius and half_light_radius may be specified,\
         scale_radius={}, half_light_radius={}".format(scale_radius, half_light_radius))
     else:
-      raise NotImplementedError("to implement, see https://github.com/GalSim-developers/GalSim/blob/6c1eb247df86ec03d1a2c9c8024fe57b1bd4a154/src/SBSersic.cpp#L656")
+      raise NotImplementedError("to implement, see\
+        https://github.com/GalSim-developers/GalSim/blob/6c1eb247df86ec03d1a2c9c8024fe57b1bd4a154/src/SBSersic.cpp#L656")
   elif scale_radius is not None:
     r0 = scale_radius
   else:
@@ -98,7 +133,8 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
   return sersic
 
 def integratedflux(trunc, r0, n):
+  """ Convenience function to compute the fraction of the total flux enclosed within a given radius
+  """
   r = trunc / r0
   z = tf.math.pow(r, 1./n)
   return tf.math.igamma(2.*n, z)
-  
