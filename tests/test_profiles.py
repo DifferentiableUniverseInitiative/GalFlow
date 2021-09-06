@@ -55,6 +55,7 @@ stamp_size = 55   # pixel
 scale_radius = 5  # arcsec
 n = 2             
 flux = 40         # photons/cm^2/s
+trunc = 10.       # arcsec
 
 def test_sersic_profile():
   """
@@ -72,5 +73,16 @@ def test_sersic_profile():
   image_galsim_size = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
   image_galflow_size = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size, ny=stamp_size+1)
 
+  # check truncated profile, flux_untruncated=Flase
+  obj = galsim.Sersic(n=n, scale_radius=scale_radius, trunc=trunc, flux_untruncated=False)
+  image_galsim_truncf = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_truncf = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size, ny=stamp_size+1, trunc=trunc, flux_untruncated=False)
+  
+  # check truncated profile, flux_untruncated=True
+  obj = galsim.Sersic(n=n, scale_radius=scale_radius, trunc=trunc, flux_untruncated=True)
+  image_galsim_trunct = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_trunct = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size, ny=stamp_size+1, trunc=trunc, flux_untruncated=True)
+
   assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-4)
-  assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-4)
+  assert_allclose(image_galsim_truncf, image_galflow_truncf, rtol=1e-4)
+  assert_allclose(image_galsim_trunct, image_galflow_trunct, rtol=1e-4)

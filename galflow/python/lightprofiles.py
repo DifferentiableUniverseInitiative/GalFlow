@@ -64,6 +64,9 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
     if ny is None:
       ny = nx
 
+  if trunc < 0.:
+    raise ValueError("Sersic trunc must be > 0.")
+    
   if half_light_radius is not None:
     if scale_radius is not None:
       raise ValueError("Only one of scale_radius and half_light_radius may be specified,\
@@ -78,8 +81,8 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
     
   if trunc > 0.:
     flux_fraction = integratedflux(trunc, r0, n)
-    if flux_untruncated:
-      flux *= flux_fraction
+    if not flux_untruncated:
+      flux /= flux_fraction
   else:
     flux_fraction = 1.
 
@@ -87,6 +90,8 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
   z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32))
 
   sersic = tf.exp(-tf.math.pow(z/r0, 1/n))
+  if trunc > 0.:
+    sersic = tf.cast((z<trunc), tf.float32) * sersic
   sersic /= math.pi * r0 * r0 * math.factorial(2.*n)
   sersic *= flux
 
