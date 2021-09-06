@@ -39,7 +39,7 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., stamp_size=
     
   x, y = tf.cast(tf.meshgrid(tf.range(stamp_size), tf.range(stamp_size)), tf.float32)
   # need to check how to properly consider the even and odd stamp sizes
-  z = tf.sqrt(tf.cast((x-tf.math.floor(stamp_size/2))**2 + (y-tf.math.floor(stamp_size/2))**2, tf.float32))
+  z = tf.sqrt(tf.cast((x+.5-stamp_size/2)**2 + (y+.5-stamp_size/2)**2, tf.float32))
   gaussian = flux * tf.exp(-z*z / 2 / sigma/sigma) / 2 / math.pi / sigma / sigma
 
   return gaussian
@@ -70,7 +70,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
 
   x, y = tf.cast(tf.meshgrid(tf.range(stamp_size), tf.range(stamp_size)), tf.float32)
   # need to check how to properly consider the even and odd stamp sizes
-  z = tf.sqrt(tf.cast((x-tf.math.floor(stamp_size/2))**2 + (y-tf.math.floor(stamp_size/2))**2, tf.float32))
+  z = tf.sqrt(tf.cast((x+.5-stamp_size/2)**2 + (y+.5-stamp_size/2)**2, tf.float32))
 
   sersic = tf.exp(-tf.math.pow(z/r0, 1/n))
   sersic /= math.pi * r0 * r0 * math.factorial(2.*n)
