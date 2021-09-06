@@ -71,7 +71,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
 
     :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
     where
-    :math:`I0 = \pi r_0^2 (2n)!`
+    :math:`I0 = 1 / (\pi r_0^2 (2n)!)`
 
   Args:
     n: `int`, Sersic index.
