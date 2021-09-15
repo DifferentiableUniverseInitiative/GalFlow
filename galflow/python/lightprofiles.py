@@ -136,7 +136,8 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
     sersic = tf.exp(-tf.math.pow(z/r0, 1/n))
     if trunc > 0.:
       sersic = tf.cast((z<trunc), tf.float32) * sersic
-    sersic /= math.pi * r0 * r0 * math.factorial(2.*n)
+    #sersic /= math.pi * r0 * r0 * math.factorial(2.*n)
+    sersic /= 2 * math.pi * r0 * r0 * n * tf.math.exp(tf.math.lgamma(2.*n))
     sersic *= flux
 
     return sersic
