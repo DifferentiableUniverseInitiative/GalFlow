@@ -68,6 +68,11 @@ def test_sersic_profile():
   image_galsim_scale_radius = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
   image_galflow_scale_radius = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size)
 
+  # check half_light_radius input
+  obj = galsim.Gaussian(half_light_radius=hlr)
+  image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galflow_hlr = gf.lightprofiles.sersic(n=n, half_light_radius=hlr, nx=stamp_size)
+
   # check even and odd stamp sizes
   obj = galsim.Sersic(n=n, scale_radius=scale_radius)
   image_galsim_size = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
@@ -84,6 +89,7 @@ def test_sersic_profile():
   image_galflow_trunct = gf.lightprofiles.sersic(n=n, scale_radius=scale_radius, nx=stamp_size, ny=stamp_size+1, trunc=trunc, flux_untruncated=True)
 
   assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-5)
+  assert_allclose(image_galsim_hlr, image_galflow_hlr, rtol=1e-5)
   assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-5)
   assert_allclose(image_galsim_truncf, image_galflow_truncf, rtol=1e-5)
   assert_allclose(image_galsim_trunct, image_galflow_trunct, rtol=1e-5)
