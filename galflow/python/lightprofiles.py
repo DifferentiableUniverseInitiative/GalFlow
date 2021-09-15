@@ -17,7 +17,7 @@ fwhm_factor = 2*math.sqrt(2*math.log(2))
 # The half-light-radius is sqrt(2 ln2) sigma
 hlr_factor = math.sqrt(2*math.log(2))
 
-def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., nx=None, ny=None, name=None):
+def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., nx=None, ny=None, name=None):
   """Function for generating a Gaussian profile:
 
     :math:`I(r) = \exp\left(-\frac{r^2}{2\sigma^2}\right) / (2 \pi \sigma^2)`
@@ -64,12 +64,13 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., nx=None, ny
           fwhm={}, half_light_radius={}, sigma={}".format(fwhm, half_light_radius, sigma))
       
     x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
-    z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32))
-    gaussian = flux * tf.exp(-z*z / 2 / sigma/sigma) / 2 / math.pi / sigma / sigma
+    z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32)) * scale
+    gaussian = flux * tf.exp(-z*z / 2 / sigma/sigma) / 2 / math.pi / sigma / sigma  * scale  * scale
 
     return gaussian
 
-def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux_untruncated=False, nx=None, ny=None, name=None):
+def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0.,
+          flux_untruncated=False, nx=None, ny=None, scale=1., name=None):
   """Function for generating a Sersic profile:
 
     :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
@@ -110,8 +111,6 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
         raise ValueError("Only one of scale_radius and half_light_radius may be specified,\
           scale_radius={}, half_light_radius={}".format(scale_radius, half_light_radius))
       else:
-        #raise NotImplementedError("to implement, see\
-        #  https://github.com/GalSim-developers/GalSim/blob/6c1eb247df86ec03d1a2c9c8024fe57b1bd4a154/src/SBSersic.cpp#L656")
         if trunc==0. or flux_untruncated:
           r0 = half_light_radius / calculateHLRFactor(n, 0.)
         else:
@@ -131,12 +130,11 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0., flux
       flux_fraction = 1.
 
     x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
-    z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32))
+    z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32)) * scale
 
-    sersic = tf.exp(-tf.math.pow(z/r0, 1/n))
+    sersic = tf.exp(-tf.math.pow(z/r0, 1/n))  * scale  * scale
     if trunc > 0.:
       sersic = tf.cast((z<trunc), tf.float32) * sersic
-    #sersic /= math.pi * r0 * r0 * math.factorial(2.*n)
     sersic /= 2 * math.pi * r0 * r0 * n * tf.math.exp(tf.math.lgamma(2.*n))
     sersic *= flux
 
