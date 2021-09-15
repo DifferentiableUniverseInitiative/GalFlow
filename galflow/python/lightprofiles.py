@@ -23,12 +23,14 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., n
     :math:`I(r) = \exp\left(-\frac{r^2}{2\sigma^2}\right) / (2 \pi \sigma^2)`
 
   Args:
-    sigma: `float`, sigma of the profile. Typically given in arcsec.
     fwhm: `float`, full-width-half-max of the profile.  Typically given in arcsec.
     half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
+    sigma: `float`, sigma of the profile. Typically given in arcsec.
     flux: `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
+    scale: `float`, the pixel scale to use for the drawn image
     nx: `int`, width of the stamp
     ny: `int`, height of the stamp
+
 
   Returns:
     `Tensor` of shape [nx, ny] of the centered profile
@@ -70,7 +72,7 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., n
     return gaussian
 
 def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0.,
-          flux_untruncated=False, nx=None, ny=None, scale=1., name=None):
+          flux_untruncated=False, scale=1., nx=None, ny=None, name=None):
   """Function for generating a Sersic profile:
 
     :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
@@ -82,10 +84,11 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0.,
     half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
     scale_radius: `float`, scale radius of the profile.  Typically given in arcsec.
     flux: `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
-    nx: `int`, width of the stamp
-    ny: `int`, height of the stamp
     trunc: `float`, an optional truncation radius at which the profile is made to drop to zero, in the same units as the size parameter.
     flux_untruncated: `boolean`, specifies whether the ``flux`` and ``half_light_radius`` specifications correspond to the untruncated profile (``True``) or to the truncated profile (``False``, default)
+    scale: `float`, the pixel scale to use for the drawn image
+    nx: `int`, width of the stamp
+    ny: `int`, height of the stamp
 
   Returns:
     `Tensor` of shape [nx, ny] of the centered profile
