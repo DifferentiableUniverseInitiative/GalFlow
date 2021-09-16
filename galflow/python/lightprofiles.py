@@ -67,6 +67,7 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., n
       
     x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
     z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32)) * scale
+    
     gaussian = flux * tf.exp(-z*z / 2 / sigma/sigma) / 2 / math.pi / sigma / sigma  * scale  * scale
 
     return gaussian
