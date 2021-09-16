@@ -78,7 +78,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0.,
 
     :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
     where
-    :math:`I0 = 1 / (\pi r_0^2 (2n)!)`
+    :math:`I0 = 1 / (2\pi r_0^2 n \Gamma(2n))`
 
   Args:
     n: `int`, Sersic index.
@@ -151,18 +151,6 @@ def integratedflux(trunc, r0, n):
   z = tf.math.pow(r, 1./n)
   return tf.math.igamma(2.*n, z)
 
-def calculate_b_approx(n):
-  """Find the solution to gamma(2n; b_n) = Gamma(2n)/2 
-  Start with approximation from Ciotti & Bertin, 1999:
-  b ~= 2n - 1/3 + 4/(405n) + 46/(25515n^2) + 131/(1148175n^3) - ...
-  
-  So far we only use the approximation above, but we should use a non-linear solver
-  like Broyden and use tf.custom_gradient
-  """
-  b1 = 2.*n-1./3.
-  b2 = b1 + (8./405.)*(1./n) + (46./25515.)*(1./n/n) + (131./1148175.)*(1./n/n/n)
-  return b2
-
 def calculate_b(n):
   """Find the solution to gamma(2n; b_n) = Gamma(2n)/2 
   Start with approximation from Ciotti & Bertin, 1999:
@@ -182,7 +170,7 @@ def calculate_b(n):
   
   def Broyden_solver(b2, b1):
     z_prev, z = b2, update(b2, b1)
-    while func(z) > 1e-5:# and z > 0.:
+    while func(z) > 1e-5:
       z_prev, z = z, update(z, z_prev)
     return z
   
