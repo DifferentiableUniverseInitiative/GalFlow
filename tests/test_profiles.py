@@ -92,6 +92,15 @@ def test_sersic_profile():
   image_galsim_scale_radius = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
   image_galflow_scale_radius = gf.lightprofiles.sersic(n=[n], scale_radius=[scale_radius], nx=stamp_size)[0,...]
 
+  # check batch input
+  obj1 = galsim.Sersic(n=n, scale_radius=scale_radius)
+  obj2 = galsim.Sersic(n=n*2, scale_radius=scale_radius*2)
+  image_galsim_batch1 = obj1.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch2 = obj2.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch = np.stack([image_galsim_batch1, image_galsim_batch2], axis=0)
+  image_galflow_batch = gf.lightprofiles.sersic(n=[n, n*2.], scale_radius=[scale_radius, scale_radius*2.], nx=stamp_size)
+
+
   # check half_light_radius input
   obj = galsim.Sersic(n=n, half_light_radius=hlr, flux=flux)
   image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
@@ -118,6 +127,7 @@ def test_sersic_profile():
   image_galflow_trunct = gf.lightprofiles.sersic(n=[n], scale_radius=[scale_radius], nx=stamp_size, ny=stamp_size+1, trunc=[trunc], flux_untruncated=[True])[0,...]
 
   assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-5)
+  assert_allclose(image_galsim_batch, image_galflow_batch, atol=1e-5)
   assert_allclose(image_galsim_hlr, image_galflow_hlr, rtol=1e-5)
   assert_allclose(image_galsim_scale, image_galflow_scale, rtol=1e-5)
   assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-5)
