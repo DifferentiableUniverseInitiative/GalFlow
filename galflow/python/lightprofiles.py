@@ -17,12 +17,17 @@ fwhm_factor = 2*math.sqrt(2*math.log(2))
 # The half-light-radius is sqrt(2 ln2) sigma
 hlr_factor = math.sqrt(2*math.log(2))
 
-def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., nx=None, ny=None, name=None):
+def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=None, scale=1., nx=None, ny=None, name=None):
   """Function for generating a Gaussian profile:
 
     :math:`I(r) = \exp\left(-\frac{r^2}{2\sigma^2}\right) / (2 \pi \sigma^2)`
 
   Args:
+    
+    /!\
+    /!\ So far assuming same stamp size and pixel scale
+    /!\
+
     fwhm: `float`, full-width-half-max of the profile.  Typically given in arcsec.
     half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
     sigma: `float`, sigma of the profile. Typically given in arcsec.
@@ -54,20 +59,34 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., n
         raise ValueError("Only one of sigma, fwhm, and half_light_radius may be specified,\
           fwhm={}, half_light_radius={}, sigma={}".format(fwhm, half_light_radius, sigma))
       else:
+        fwhm = tf.convert_to_tensor(fwhm, dtype=tf.float32)
         sigma = fwhm / fwhm_factor
     elif half_light_radius is not None:
       if sigma is not None:
         raise ValueError("Only one of sigma, fwhm, and half_light_radius may be specified,\
           fwhm={}, half_light_radius={}, sigma={}".format(fwhm, half_light_radius, sigma))
       else:
+        half_light_radius = tf.convert_to_tensor(half_light_radius, dtype=tf.float32)
         sigma = half_light_radius / hlr_factor
     elif sigma is None:
       raise ValueError("One of sigma, fwhm, and half_light_radius must be specified,\
           fwhm={}, half_light_radius={}, sigma={}".format(fwhm, half_light_radius, sigma))
-      
+    sigma = tf.convert_to_tensor(sigma, dtype=tf.float32)
+    batch_size = sigma.shape[0]
+    if flux is None:
+      flux = tf.ones(batch_size)
+    else:  
+      flux = tf.convert_to_tensor(flux, dtype=tf.float32)
+
     x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
+    x = tf.repeat(tf.expand_dims(x, 0), batch_size, axis=0)
+    y = tf.repeat(tf.expand_dims(y, 0), batch_size, axis=0)
+
     z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32)) * scale
     
+    flux = tf.reshape(flux, (batch_size, 1, 1))
+    sigma = tf.reshape(sigma, (batch_size, 1, 1))
+
     gaussian = flux * tf.exp(-z*z / 2 / sigma/sigma) / 2 / math.pi / sigma / sigma  * scale  * scale
 
     return gaussian
@@ -75,6 +94,10 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=1., scale=1., n
 def sersic(n, half_light_radius=None, scale_radius=None, flux=1., trunc=0.,
           flux_untruncated=False, scale=1., nx=None, ny=None, name=None):
   """Function for generating a Sersic profile:
+
+    /!\
+    /!\ We want to have things in batch !!!!!!!!!!!!!!!
+    /!\
 
     :math:`I(r) = I0 \exp(-\left(r/r_0\right)^{\frac{1}{n}})`
     where

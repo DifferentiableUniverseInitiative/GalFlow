@@ -22,34 +22,43 @@ def test_gaussian_profile():
   # check sigma input
   obj = galsim.Gaussian(sigma=sigma)
   image_galsim_sigma = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
-  image_galflow_sigma = gf.lightprofiles.gaussian(sigma=sigma, nx=stamp_size, ny=stamp_size)
+  image_galflow_sigma = gf.lightprofiles.gaussian(sigma=[sigma], nx=stamp_size, ny=stamp_size)[0,...]
+
+  # check batch input
+  obj1 = galsim.Gaussian(sigma=sigma)
+  obj2 = galsim.Gaussian(sigma=sigma*2)
+  image_galsim_batch1 = obj1.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch2 = obj2.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch = np.stack([image_galsim_batch1, image_galsim_batch2], axis=0)
+  image_galflow_batch = gf.lightprofiles.gaussian(sigma=[sigma, sigma*2], nx=stamp_size, ny=stamp_size)
 
   # check half_light_radius input
   obj = galsim.Gaussian(half_light_radius=hlr)
   image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
-  image_galflow_hlr = gf.lightprofiles.gaussian(half_light_radius=hlr, nx=stamp_size, ny=stamp_size)
+  image_galflow_hlr = gf.lightprofiles.gaussian(half_light_radius=[hlr], nx=stamp_size, ny=stamp_size)[0,...]
 
   # check fwhm input
   obj = galsim.Gaussian(fwhm=fwhm)
   image_galsim_fwhm = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
-  image_galflow_fwhm = gf.lightprofiles.gaussian(fwhm=fwhm, nx=stamp_size, ny=stamp_size)
+  image_galflow_fwhm = gf.lightprofiles.gaussian(fwhm=[fwhm], nx=stamp_size, ny=stamp_size)[0,...]
 
   # check fwhm input
   obj = galsim.Gaussian(fwhm=fwhm)
   image_galsim_scale = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=scale, method='no_pixel').array
-  image_galflow_scale = gf.lightprofiles.gaussian(fwhm=fwhm, nx=stamp_size, ny=stamp_size, scale=scale)
+  image_galflow_scale = gf.lightprofiles.gaussian(fwhm=[fwhm], nx=stamp_size, ny=stamp_size, scale=scale)[0,...]
 
   # check flux input
   obj = galsim.Gaussian(fwhm=fwhm, flux=flux)
   image_galsim_flux = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
-  image_galflow_flux = gf.lightprofiles.gaussian(fwhm=fwhm, flux=flux, nx=stamp_size, ny=stamp_size)
+  image_galflow_flux = gf.lightprofiles.gaussian(fwhm=[fwhm], flux=[flux], nx=stamp_size, ny=stamp_size)[0,...]
 
   # check even and odd stamp sizes
   obj = galsim.Gaussian(fwhm=fwhm, flux=flux)
   image_galsim_size = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
-  image_galflow_size = gf.lightprofiles.gaussian(fwhm=fwhm, flux=flux, nx=stamp_size, ny=stamp_size+1)
+  image_galflow_size = gf.lightprofiles.gaussian(fwhm=[fwhm], flux=[flux], nx=stamp_size, ny=stamp_size+1)[0,...]
 
   assert_allclose(image_galsim_sigma, image_galflow_sigma, atol=1e-5)
+  assert_allclose(image_galsim_batch, image_galflow_batch, atol=1e-5)
   assert_allclose(image_galsim_hlr, image_galflow_hlr, atol=1e-5)
   assert_allclose(image_galsim_fwhm, image_galflow_fwhm, atol=1e-5)
   assert_allclose(image_galsim_scale, image_galflow_scale, rtol=1e-5)
