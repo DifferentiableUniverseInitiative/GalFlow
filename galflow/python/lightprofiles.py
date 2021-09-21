@@ -209,17 +209,26 @@ def calculate_b(n):
   b2 = b1 + (8./405.)*(1./n) + (46./25515.)*(1./n/n) + (131./1148175.)*(1./n/n/n)
 
   def func(b):
-    return 2.*tf.math.igamma(2*n, b) - 1.
+    apply = tf.cast(b>=0., tf.float32)
+    b = b * apply + tf.ones(b.shape)* (1-apply)
+    res = 2.*tf.math.igamma(2*n, b) - 1.
+    res = res * apply - 100.*tf.ones(b.shape)* (1-apply)
+    return res
 
   def update(z, zprev, not_done):
-    fp_z = (func(z) - func(zprev)) / (z - zprev)
-    return z - func(z)/fp_z * tf.cast(not_done, tf.float32)
+    f_zprez = func(zprev) * tf.cast(func(zprev)!=-100., tf.float32) 
+    fp_z = (func(z) - f_zprez) / (z - zprev)
+    not_done = tf.math.logical_and(not_done, func(zprev)!=-100.)
+    
+    return z - func(z)/fp_z * tf.cast(not_done, tf.float32), not_done
   
   def Broyden_solver(b2, b1):
-    z_prev, z = b2, update(b2, b1, tf.cast(tf.ones(b2.shape[0]), tf.bool))
-    while not tf.reduce_all(func(z) < 1e-5):
-      not_done = func(z) > 1e-5
-      z_prev, z = z, update(z, z_prev, not_done)
+    z_prev, (z, not_done) = b2, update(b2, b1, tf.cast(b1>=0., tf.bool))
+    not_done = tf.math.logical_and(not_done, func(z) > 1e-5)
+    
+    while tf.reduce_any(not_done):
+      z_prev, (z, not_done) = z, update(z, z_prev, not_done)
+      not_done = tf.math.logical_and(not_done, func(z) > 1e-6)
     return z
   
   return Broyden_solver(b2,b1)
