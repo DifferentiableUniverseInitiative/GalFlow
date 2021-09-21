@@ -21,27 +21,22 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=None, scale=1.,
   """Function for generating a Gaussian profile:
 
     :math:`I(r) = \exp\left(-\frac{r^2}{2\sigma^2}\right) / (2 \pi \sigma^2)`
-
+  
+  Assuming same stamp size and pixel scale
   Args:
-    
-    /!\
-    /!\ So far assuming same stamp size and pixel scale
-    /!\
-
-    fwhm: `float`, full-width-half-max of the profile.  Typically given in arcsec.
-    half_light_radius: `float`, half-light radius of the profile.  Typically given in arcsec.
-    sigma: `float`, sigma of the profile. Typically given in arcsec.
-    flux: `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
+    fwhm: List of `float`, full-width-half-max of the profile.  Typically given in arcsec.
+    half_light_radius: List of `float`, half-light radius of the profile.  Typically given in arcsec.
+    sigma: List of `float`, sigma of the profile. Typically given in arcsec.
+    flux: List of `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
     scale: `float`, the pixel scale to use for the drawn image
     nx: `int`, width of the stamp
     ny: `int`, height of the stamp
 
-
   Returns:
-    `Tensor` of shape [nx, ny] of the centered profile
+    `Tensor` of shape [batch_size, nx, ny] of the centered profile
 
   Example:
-    >>> gaussian(sigma=3., nx=55)
+    >>> gaussian(sigma=[3.], nx=55)
   """
 
   with tf.name_scope(name or "gaussian"):
