@@ -72,7 +72,10 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=None, scale=1.,
     else:  
       flux = tf.convert_to_tensor(flux, dtype=tf.float32)
 
-    x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
+    x, y = tf.meshgrid(tf.range(nx), tf.range(ny))
+    x = tf.cast(x, tf.float32)
+    y = tf.cast(y, tf.float32)
+
     x = tf.repeat(tf.expand_dims(x, 0), batch_size, axis=0)
     y = tf.repeat(tf.expand_dims(y, 0), batch_size, axis=0)
 
@@ -163,7 +166,10 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
     normalize = tf.cast(tf.math.logical_and(trunc > 0., tf.math.logical_not(flux_untruncated)), tf.float32)
     flux = flux * (1-normalize) + flux / flux_fraction * normalize
 
-    x, y = tf.cast(tf.meshgrid(tf.range(nx), tf.range(ny)), tf.float32)
+    x, y = tf.meshgrid(tf.range(nx), tf.range(ny))
+    x = tf.cast(x, tf.float32)
+    y = tf.cast(y, tf.float32)
+    
     x = tf.repeat(tf.expand_dims(x, 0), batch_size, axis=0)
     y = tf.repeat(tf.expand_dims(y, 0), batch_size, axis=0)
 
@@ -226,9 +232,20 @@ def calculate_b(n):
     z_prev, (z, not_done) = b2, update(b2, b1, tf.cast(b1>=0., tf.bool))
     not_done = tf.math.logical_and(not_done, func(z) > 1e-5)
     
-    while tf.reduce_any(not_done):
+    # while tf.reduce_any(not_done):
+    #   z_prev, (z, not_done) = z, update(z, z_prev, not_done)
+    #   not_done = tf.math.logical_and(not_done, func(z) > 1e-6)
+    # return z
+    def condition(z, z_prev, not_done): 
+      return tf.reduce_any(not_done)
+
+    def body(z, z_prev, not_done):
+      # z, z_prev, not_done = args
       z_prev, (z, not_done) = z, update(z, z_prev, not_done)
       not_done = tf.math.logical_and(not_done, func(z) > 1e-6)
+      return z, z_prev, not_done
+    
+    z, _, _ = tf.while_loop(condition, body, (z, z_prev, not_done))
     return z
   
   return Broyden_solver(b2,b1)
