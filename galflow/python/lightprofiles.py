@@ -98,7 +98,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
   
   Assuming same stamp size and pixel scale
   Args:
-    n: List of `int`, Sersic index.
+    n: List of `float`, Sersic index.
     half_light_radius: List of `float`, half-light radius of the profile.  Typically given in arcsec.
     scale_radius: List of `float`, scale radius of the profile.  Typically given in arcsec.
     flux: List of `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
