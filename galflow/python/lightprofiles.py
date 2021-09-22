@@ -112,7 +112,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
     `Tensor` of shape [batch_size, nx, ny] of the centered profile
 
   Example:
-    >>> sersic(n=2, scale_radius=5., flux=40., nx=55)
+    >>> sersic(n=[2.], scale_radius=[5.], flux=[40.], nx=55)
   """
   with tf.name_scope(name or "sersic"):
     if nx is None:
@@ -169,7 +169,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
     x, y = tf.meshgrid(tf.range(nx), tf.range(ny))
     x = tf.cast(x, tf.float32)
     y = tf.cast(y, tf.float32)
-    
+
     x = tf.repeat(tf.expand_dims(x, 0), batch_size, axis=0)
     y = tf.repeat(tf.expand_dims(y, 0), batch_size, axis=0)
 
