@@ -7,6 +7,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 import math
+from tensorflow.python.ops.gen_array_ops import ones_like
 
 from tensorflow.python.types.core import Value
 
@@ -162,9 +163,7 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
     else:  
       flux = tf.convert_to_tensor(flux, dtype=tf.float32)
 
-    flux_fraction = integratedflux(trunc, r0, n)
-    normalize = tf.cast(tf.math.logical_and(trunc > 0., tf.math.logical_not(flux_untruncated)), tf.float32)
-    flux = flux * (1-normalize) + flux / flux_fraction * normalize
+    flux = sersic_flux_normalization(flux, trunc, r0, n, flux_untruncated)
 
     x, y = tf.meshgrid(tf.range(nx), tf.range(ny))
     x = tf.cast(x, tf.float32)
@@ -181,17 +180,56 @@ def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
     trunc = tf.reshape(trunc, (batch_size, 1, 1))
 
     sersic = tf.exp(-tf.math.pow(z/r0, 1/n))  * scale  * scale
-    
+
     trunc = trunc * tf.cast(trunc>0., tf.float32) + tf.math.sqrt(nx*nx*1.+ny*ny*1.) * scale * tf.cast(trunc==0., tf.float32)
     sersic = tf.cast((z<trunc), tf.float32) * sersic
 
-    sersic /= 2 * math.pi * r0 * r0 * n * tf.math.exp(tf.math.lgamma(2.*n))
+    sersic = sersic_normalization(sersic, n, r0)
+    
     sersic *= flux
-
+    
     return sersic
 
+def sersic_flux_normalization(flux, trunc, r0, n, flux_untruncated):
+  """Convenience function to compute the flux of a Sersic profile
+  Need to account cases where n is big and tf.math.exp(tf.math.igamma(n,z)) is inf
+  or r0 is 0.
+  """
+  def check(n, r0, trunc):
+    r = trunc / r0
+    z = tf.math.pow(r, 1./n)
+    return tf.math.igamma(2.*n, z)
+  mask = tf.cast(tf.math.is_nan(check(n, r0, trunc)), tf.float32)
+  r0 = r0 * (1-mask) + tf.ones_like(r0) * mask
+  n = n * (1-mask) + tf.ones_like(n) * mask
+  flux_fraction = integratedflux(trunc, r0, n)
+  normalize = tf.cast(tf.math.logical_and(trunc > 0., tf.math.logical_not(flux_untruncated)), tf.float32)
+  flux = flux * (1-mask) + tf.ones_like(flux)*mask
+  flux = flux * (1-normalize) + flux / flux_fraction * normalize
+  return flux
+
+
+def sersic_normalization(sersic, n, r0):
+  """Convenience function to normalize the sersic profile
+  Need to account cases where n is big and tf.math.exp(tf.math.lgamma(n)) is inf
+  """
+  check = tf.math.exp(tf.math.lgamma(2.*n))
+  isinf = tf.math.is_inf(check)
+  isr0 = r0==0.
+  mask = tf.cast(tf.math.logical_or(isinf, isr0), tf.float32)
+  n = n * (1.-mask) + tf.ones_like(n) * mask
+  r0 = r0 * (1.-mask) + tf.ones_like(r0) * mask
+  Z = 2 * math.pi * r0 * r0 * n * tf.math.exp(tf.math.lgamma(2.*n))
+  isZ = tf.cast(Z==0., tf.float32)
+  Z = Z * (1-isZ) + tf.ones_like(Z) * isZ
+
+  sersic = sersic/Z * (1-mask) + tf.zeros_like(sersic) * (mask)
+  sersic = sersic * (1-isZ) + tf.zeros_like(sersic) * isZ
+  return sersic
+
+
 def integratedflux(trunc, r0, n):
-  """ Convenience function to compute the fraction of the total flux enclosed within a given radius
+  """Convenience function to compute the fraction of the total flux enclosed within a given radius
   """
   r = trunc / r0
   z = tf.math.pow(r, 1./n)
