@@ -89,6 +89,80 @@ def gaussian(fwhm=None, half_light_radius=None, sigma=None, flux=None, scale=1.,
 
     return gaussian
 
+def exponential(half_light_radius=None, scale_radius=None, flux=None, 
+                scale=1., nx=None, ny=None, name=None):
+  """Function for generating an Exponential profile:
+
+    :math:`I(r) \sim e^{-r/r_0}`
+  
+  Assuming same stamp size and pixel scale
+  Args:
+    half_light_radius: List of `float`, half-light radius of the profile.  Typically given in arcsec.
+    scale_radius: List of `float`, scale radius of the profile.  Typically given in arcsec.
+    flux: List of `float`, flux (in photons/cm^2/s) of the profile. [default: 1]
+    scale: `float`, the pixel scale to use for the drawn image
+    nx: `int`, width of the stamp
+    ny: `int`, height of the stamp
+
+  Returns:
+    `Tensor` of shape [batch_size, nx, ny] of the centered profile
+
+  Example:
+    >>> sersic(n=[2.], scale_radius=[5.], flux=[40.], nx=55)
+  """
+  with tf.name_scope(name or "sersic"):
+    if nx is None:
+      if ny is None:
+        raise ValueError("Either nx or ny or both must be specified")
+      else:
+        nx = ny
+    else:
+      if ny is None:
+        ny = nx
+    
+    _hlr_factor = 1.6783469900166605
+
+    if half_light_radius is not None:
+      half_light_radius = tf.convert_to_tensor(half_light_radius, dtype=tf.float32)
+      batch_size = half_light_radius.shape[0]
+      if scale_radius is not None:
+        raise ValueError("Only one of scale_radius and half_light_radius may be specified,\
+          scale_radius={}, half_light_radius={}".format(scale_radius, half_light_radius))
+      else:
+        r0 = half_light_radius / _hlr_factor
+    elif scale_radius is not None:
+      scale_radius = tf.convert_to_tensor(scale_radius, dtype=tf.float32)
+      batch_size = scale_radius.shape[0]
+      r0 = scale_radius
+    else:
+      raise ValueError("Either scale_radius or half_light_radius must be specified for Exponential,\
+        half_light_radius={}, scale_radius={}".format(half_light_radius, scale_radius))
+
+    if flux is None:
+      flux = tf.ones(batch_size)
+    else:  
+      flux = tf.convert_to_tensor(flux, dtype=tf.float32)
+
+    x, y = tf.meshgrid(tf.range(nx), tf.range(ny))
+    x = tf.cast(x, tf.float32)
+    y = tf.cast(y, tf.float32)
+
+    x = tf.repeat(tf.expand_dims(x, 0), batch_size, axis=0)
+    y = tf.repeat(tf.expand_dims(y, 0), batch_size, axis=0)
+
+    z = tf.sqrt(tf.cast((x+.5-nx/2)**2 + (y+.5-ny/2)**2, tf.float32)) * scale
+
+    flux = tf.reshape(flux, (batch_size, 1, 1))
+    r0 = tf.reshape(r0, (batch_size, 1, 1))
+
+    exponential = tf.exp(-tf.math.abs(z/r0))  * scale  * scale
+
+    exponential /=  2 * math.pi * r0 * r0
+    
+    exponential *= flux
+    
+    return exponential
+
 def sersic(n, half_light_radius=None, scale_radius=None, flux=None, trunc=None,
           flux_untruncated=None, scale=1., nx=None, ny=None, name=None):
   """Function for generating a Sersic profile:
