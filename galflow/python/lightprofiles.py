@@ -123,16 +123,16 @@ def exponential(half_light_radius=None, scale_radius=None, flux=None,
     _hlr_factor = 1.6783469900166605
 
     if half_light_radius is not None:
+      batch_size = len(half_light_radius)
       half_light_radius = tf.convert_to_tensor(half_light_radius, dtype=tf.float32)
-      batch_size = half_light_radius.shape[0]
       if scale_radius is not None:
         raise ValueError("Only one of scale_radius and half_light_radius may be specified,\
           scale_radius={}, half_light_radius={}".format(scale_radius, half_light_radius))
       else:
         r0 = half_light_radius / _hlr_factor
     elif scale_radius is not None:
+      batch_size = len(scale_radius)
       scale_radius = tf.convert_to_tensor(scale_radius, dtype=tf.float32)
-      batch_size = scale_radius.shape[0]
       r0 = scale_radius
     else:
       raise ValueError("Either scale_radius or half_light_radius must be specified for Exponential,\
