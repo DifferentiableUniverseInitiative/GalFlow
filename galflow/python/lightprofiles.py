@@ -108,7 +108,7 @@ def exponential(half_light_radius=None, scale_radius=None, flux=None,
     `Tensor` of shape [batch_size, nx, ny] of the centered profile
 
   Example:
-    >>> sersic(n=[2.], scale_radius=[5.], flux=[40.], nx=55)
+    >>> exponential(scale_radius=[5.], flux=[40.], nx=55)
   """
   with tf.name_scope(name or "sersic"):
     if nx is None:
