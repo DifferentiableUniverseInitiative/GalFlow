@@ -100,7 +100,6 @@ def test_sersic_profile():
   image_galsim_batch = np.stack([image_galsim_batch1, image_galsim_batch2], axis=0)
   image_galflow_batch = gf.lightprofiles.sersic(n=[n, n*2.], scale_radius=[scale_radius, scale_radius*2.], nx=stamp_size)
 
-
   # check half_light_radius input
   obj = galsim.Sersic(n=n, half_light_radius=hlr, flux=flux)
   image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
@@ -133,3 +132,93 @@ def test_sersic_profile():
   assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-5)
   assert_allclose(image_galsim_truncf, image_galflow_truncf, rtol=1e-5)
   assert_allclose(image_galsim_trunct, image_galflow_trunct, rtol=1e-5)
+
+def test_deVaucouleurs_profile():
+  """This test generates a simple deVaucouleurs light profile with Galsim and GalFlow,
+  then checks that the same image stamp is recovered
+  """  
+
+  # check scale_radius input
+  obj = galsim.DeVaucouleurs(scale_radius=scale_radius)
+  image_galsim_scale_radius = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galflow_scale_radius = gf.lightprofiles.deVaucouleurs(scale_radius=[scale_radius], nx=stamp_size)[0,...]
+  
+  # check batch input
+  obj1 = galsim.DeVaucouleurs(scale_radius=scale_radius)
+  obj2 = galsim.DeVaucouleurs(scale_radius=scale_radius*2)
+  image_galsim_batch1 = obj1.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch2 = obj2.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch = np.stack([image_galsim_batch1, image_galsim_batch2], axis=0)
+  image_galflow_batch = gf.lightprofiles.deVaucouleurs(scale_radius=[scale_radius, scale_radius*2.], nx=stamp_size)
+
+  # check half_light_radius input
+  obj = galsim.DeVaucouleurs(half_light_radius=hlr, flux=flux)
+  image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galflow_hlr = gf.lightprofiles.deVaucouleurs(half_light_radius=[hlr], nx=stamp_size, flux=flux)[0,...]
+
+  # check scale input
+  obj = galsim.DeVaucouleurs(half_light_radius=hlr, flux=flux)
+  image_galsim_scale = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=scale, method='no_pixel').array
+  image_galflow_scale = gf.lightprofiles.deVaucouleurs(half_light_radius=[hlr], nx=stamp_size, flux=[flux], scale=scale)[0,...]
+
+  # check even and odd stamp sizes
+  obj = galsim.DeVaucouleurs(scale_radius=scale_radius)
+  image_galsim_size = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_size = gf.lightprofiles.deVaucouleurs(scale_radius=[scale_radius], nx=stamp_size, ny=stamp_size+1)[0,...]
+
+  # check truncated profile, flux_untruncated=Flase
+  obj = galsim.DeVaucouleurs(scale_radius=scale_radius, trunc=trunc, flux_untruncated=False)
+  image_galsim_truncf = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_truncf = gf.lightprofiles.deVaucouleurs(scale_radius=[scale_radius], nx=stamp_size, ny=stamp_size+1, trunc=[trunc], flux_untruncated=[False])[0,...]
+  
+  # check truncated profile, flux_untruncated=True
+  obj = galsim.DeVaucouleurs(scale_radius=scale_radius, trunc=trunc, flux_untruncated=True)
+  image_galsim_trunct = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_trunct = gf.lightprofiles.deVaucouleurs(scale_radius=[scale_radius], nx=stamp_size, ny=stamp_size+1, trunc=[trunc], flux_untruncated=[True])[0,...]
+
+  assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-5)
+  assert_allclose(image_galsim_batch, image_galflow_batch, atol=1e-5)
+  assert_allclose(image_galsim_hlr, image_galflow_hlr, rtol=1e-5)
+  assert_allclose(image_galsim_scale, image_galflow_scale, rtol=1e-5)
+  assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-5)
+  assert_allclose(image_galsim_truncf, image_galflow_truncf, rtol=1e-5)
+  assert_allclose(image_galsim_trunct, image_galflow_trunct, rtol=1e-5)
+
+def test_exponential_profile():
+  """This test generates a simple deVaucouleurs light profile with Galsim and GalFlow,
+  then checks that the same image stamp is recovered
+  """  
+
+  # check scale_radius input
+  obj = galsim.Exponential(scale_radius=scale_radius)
+  image_galsim_scale_radius = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galflow_scale_radius = gf.lightprofiles.exponential(scale_radius=[scale_radius], nx=stamp_size)[0,...]
+  
+  # check batch input
+  obj1 = galsim.Exponential(scale_radius=scale_radius)
+  obj2 = galsim.Exponential(scale_radius=scale_radius*2)
+  image_galsim_batch1 = obj1.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch2 = obj2.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galsim_batch = np.stack([image_galsim_batch1, image_galsim_batch2], axis=0)
+  image_galflow_batch = gf.lightprofiles.exponential(scale_radius=[scale_radius, scale_radius*2.], nx=stamp_size)
+
+  # check half_light_radius input
+  obj = galsim.Exponential(half_light_radius=hlr, flux=flux)
+  image_galsim_hlr = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=1., method='no_pixel').array
+  image_galflow_hlr = gf.lightprofiles.exponential(half_light_radius=[hlr], nx=stamp_size, flux=flux)[0,...]
+
+  # check scale input
+  obj = galsim.Exponential(half_light_radius=hlr, flux=flux)
+  image_galsim_scale = obj.drawImage(nx=stamp_size, ny=stamp_size, scale=scale, method='no_pixel').array
+  image_galflow_scale = gf.lightprofiles.exponential(half_light_radius=[hlr], nx=stamp_size, flux=[flux], scale=scale)[0,...]
+
+  # check even and odd stamp sizes
+  obj = galsim.Exponential(scale_radius=scale_radius)
+  image_galsim_size = obj.drawImage(nx=stamp_size, ny=stamp_size+1, scale=1., method='no_pixel').array
+  image_galflow_size = gf.lightprofiles.exponential(scale_radius=[scale_radius], nx=stamp_size, ny=stamp_size+1)[0,...]
+
+  assert_allclose(image_galsim_scale_radius, image_galflow_scale_radius, rtol=1e-5)
+  assert_allclose(image_galsim_batch, image_galflow_batch, atol=1e-5)
+  assert_allclose(image_galsim_hlr, image_galflow_hlr, rtol=1e-5)
+  assert_allclose(image_galsim_scale, image_galflow_scale, rtol=1e-5)
+  assert_allclose(image_galsim_size, image_galflow_size, rtol=1e-5)
