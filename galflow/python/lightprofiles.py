@@ -110,7 +110,7 @@ def exponential(half_light_radius=None, scale_radius=None, flux=None,
   Example:
     >>> exponential(scale_radius=[5.], flux=[40.], nx=55)
   """
-  with tf.name_scope(name or "sersic"):
+  with tf.name_scope(name or "exponential"):
     if nx is None:
       if ny is None:
         raise ValueError("Either nx or ny or both must be specified")
