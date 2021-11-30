@@ -11,7 +11,7 @@ from tensorflow.python.ops.gen_array_ops import ones_like
 
 from tensorflow.python.types.core import Value
 
-__all__ = ["gaussian", "sersic", "deVaucouleurs"]
+__all__ = ["gaussian", "sersic", "deVaucouleurs", "exponential"]
 
 # The FWHM of a Gaussian is 2 sqrt(2 ln2) sigma
 fwhm_factor = 2*math.sqrt(2*math.log(2))
